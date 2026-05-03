@@ -214,7 +214,7 @@
         <div id="news-area"><div class="loading">Loading news...</div></div>
       </div>
       <div class="panel">
-        <div class="panel-title">Insider transactions (90 days)</div>
+        <div class="panel-title">Insider purchases (90 days)</div>
         <div id="insider-area"><div class="loading">Loading insider data...</div></div>
       </div>
     </div>
@@ -224,7 +224,7 @@
 
 <script>
 const API = 'd7r4jipr01qtpsm11qm0d7r4jipr01qtpsm11qmg';
-const STOCKS = ['LWLG','META','WISE','TTWO','EVO','SWRD','3I'];
+const STOCKS = ['LWLG','META','WISE','TTWO','EVO','SWRD.AS','3I'];
 const COLORS = ['#c8f060','#60d0f0','#f0b060','#f06060','#a060f0','#60d090','#f060c0'];
 let quotes = {};
 let chartInst = null;
@@ -311,16 +311,16 @@ async function renderChart(sym){
       labels,
       datasets:[{
         label:sym, data:data.c,
-        borderColor:color, backgroundColor:color+'18',
-        fill:true, tension:0.3, pointRadius:0, borderWidth:1.5
+        borderColor:color, backgroundColor:color+'28',
+        fill:true, tension:0.3, pointRadius:0, borderWidth:2
       }]
     },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false} },
       scales:{
-        x:{ ticks:{maxTicksLimit:8, color:'#666460', font:{family:'DM Mono',size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
-        y:{ ticks:{color:'#666460', font:{family:'DM Mono',size:10}, callback:v=>'$'+fmt(v,2)}, grid:{color:'rgba(255,255,255,0.04)'} }
+        x:{ ticks:{maxTicksLimit:8, color:'#888480', font:{family:'DM Mono',size:10}}, grid:{color:'rgba(255,255,255,0.06)'}, border:{color:'rgba(255,255,255,0.1)'} },
+        y:{ ticks:{color:'#888480', font:{family:'DM Mono',size:10}, callback:v=>'$'+fmt(v,2)}, grid:{color:'rgba(255,255,255,0.06)'}, border:{color:'rgba(255,255,255,0.1)'} }
       }
     }
   });
@@ -347,22 +347,23 @@ async function renderNews(sym){
 
 async function renderInsider(){
   let html='';
-  for(const sym of ['LWLG','META','TTWO']){
+  for(const sym of STOCKS){
     const data=await fetchInsider(sym);
     if(!data.length) continue;
-    data.slice(0,3).forEach(t=>{
-      const isBuy=t.transactionType==='P - Purchase'||t.change>0;
+    const buys=data.filter(t=>t.transactionType==='P - Purchase'||t.change>0);
+    if(!buys.length) continue;
+    buys.slice(0,2).forEach(t=>{
       const val=Math.abs((t.change||0)*(t.transactionPrice||0));
       html+=`<div class="insider-item">
         <div>
           <div class="insider-name">${t.name||'Unknown'} <span style="font-size:10px;color:var(--muted2);font-family:var(--mono)">${sym}</span></div>
           <div class="insider-detail">${t.transactionDate||''} · ${fmtK(Math.abs(t.change||0))} shares · $${fmtK(val)}</div>
         </div>
-        <span class="${isBuy?'ins-buy':'ins-sell'}">${isBuy?'▲ BUY':'▼ SELL'}</span>
+        <span class="ins-buy">▲ BUY</span>
       </div>`;
     });
   }
-  document.getElementById('insider-area').innerHTML=html||'<div class="loading">No recent insider activity.</div>';
+  document.getElementById('insider-area').innerHTML=html||'<div class="loading">No insider purchases found in last 90 days.</div>';
 }
 
 function buildTabs(){
