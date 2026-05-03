@@ -246,11 +246,16 @@ async function fetchQuote(sym){
 }
 async function fetchCandles(sym){
   try{
-    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=30d`);
-    const d=await r.json();
+    const url=encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=30d`);
+    const r=await fetch(`https://api.allorigins.win/get?url=${url}`);
+    const wrapper=await r.json();
+    const d=JSON.parse(wrapper.contents);
     const res=d?.chart?.result?.[0];
     if(!res) return null;
-    return { t: res.timestamp, c: res.indicators.quote[0].close, s:'ok' };
+    const closes=res.indicators.quote[0].close;
+    const timestamps=res.timestamp;
+    const filtered=closes.map((c,i)=>({c,t:timestamps[i]})).filter(x=>x.c!=null);
+    return { t: filtered.map(x=>x.t), c: filtered.map(x=>x.c), s:'ok' };
   }catch(e){ return null; }
 }
 async function fetchNews(sym){
