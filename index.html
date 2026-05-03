@@ -191,6 +191,8 @@
               <th>High</th>
               <th>Low</th>
               <th>Prev close</th>
+              <th>GAK</th>
+              <th>Gains</th>
               <th>Signal</th>
             </tr>
           </thead>
@@ -226,6 +228,15 @@
 const API = 'd7r4jipr01qtpsm11qm0d7r4jipr01qtpsm11qmg';
 const STOCKS = ['LWLG','META','WISE','TTWO','EVO','SWRD.AS','3I'];
 const COLORS = ['#c8f060','#60d0f0','#f0b060','#f06060','#a060f0','#60d090','#f060c0'];
+const MPO = {
+  'LWLG':   { price: 3.57,   currency: 'USD', note: '' },
+  'META':   { price: 600.46, currency: 'USD', note: '' },
+  'WISE':   { price: 8.30,   currency: 'GBP', note: 'entry in £' },
+  'TTWO':   { price: 213.67, currency: 'USD', note: '' },
+  'EVO':    { price: 617,    currency: 'SEK', note: '' },
+  'SWRD.AS':{ price: 36.74,  currency: 'EUR', note: '' },
+  '3I':     { price: 31.00,  currency: 'GBP', note: 'entry in £' }
+};
 let quotes = {};
 let chartInst = null;
 let activeChart = 'LWLG';
@@ -302,6 +313,8 @@ function renderQuotes(){
       <td class="mono" style="color:var(--muted2)">$${fmt(q.h)}</td>
       <td class="mono" style="color:var(--muted2)">$${fmt(q.l)}</td>
       <td class="mono" style="color:var(--muted2)">$${fmt(q.pc)}</td>
+      <td class="mono" style="color:var(--muted2)">${mpo ? mpo.currency+' '+mpo.price : '—'}</td>
+      <td class="mono ${pnlCls}">${pnlStr}</td>
       <td>${signal(dp)}</td>
     </tr>`;
   }).join('');
