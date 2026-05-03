@@ -245,8 +245,13 @@ async function fetchQuote(sym){
   try{ const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${API}`); return await r.json(); }catch(e){ return null; }
 }
 async function fetchCandles(sym){
-  const to=Math.floor(Date.now()/1000), from=to-30*86400;
-  try{ const r=await fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}&token=${API}`); return await r.json(); }catch(e){ return null; }
+  try{
+    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=30d`);
+    const d=await r.json();
+    const res=d?.chart?.result?.[0];
+    if(!res) return null;
+    return { t: res.timestamp, c: res.indicators.quote[0].close, s:'ok' };
+  }catch(e){ return null; }
 }
 async function fetchNews(sym){
   const to=new Date().toISOString().split('T')[0];
